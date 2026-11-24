@@ -1,0 +1,8 @@
+jaffle_shop:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /Users/Shared/academy/agentic/projects/jaffle_shop/jaffle_shop.duckdb
+      schema: main
+      threads: 4
