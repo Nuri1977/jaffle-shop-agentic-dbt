@@ -1,0 +1,22 @@
+name: pipeline-prod
+jobs:
+  - name: transform
+    steps:
+      - name: dbt deps
+        plugin: dbt@v1
+        command: dbt deps
+      - name: dbt seed
+        plugin: dbt@v1
+        command: "dbt seed --vars '{\\\"load_source_data\\\": true}' --target prod"
+      - name: dbt build
+        plugin: dbt@v1
+        command: dbt build --target prod
+      - name: dbt docs generate
+        plugin: dbt@v1
+        command: dbt docs generate --target prod
+  - name: teardown
+    type: cleanup
+    steps:
+      - name: echo teardown
+        plugin: command@v1
+        command: echo TEARDOWN
