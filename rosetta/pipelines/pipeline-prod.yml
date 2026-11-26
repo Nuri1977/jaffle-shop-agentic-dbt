@@ -7,7 +7,7 @@ jobs:
         command: dbt deps
       - name: dbt seed
         plugin: dbt@v1
-        command: "dbt seed --vars '{\\\"load_source_data\\\": true}' --target prod"
+        command: "dbt seed --vars '{\"load_source_data\": true}' --target prod"
       - name: dbt build
         plugin: dbt@v1
         command: dbt build --target prod
