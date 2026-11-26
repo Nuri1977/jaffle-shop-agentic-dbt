@@ -4,7 +4,7 @@ customer_first_orders as (
 
     select
         customer_id,
-        date_trunc('month', min(ordered_at))::date as cohort_month
+        cast(dbt.date_trunc('month', min(ordered_at)) as date) as cohort_month
 
     from {{ ref('orders') }}
 
@@ -19,11 +19,7 @@ customer_orders as (
         o.customer_id,
         c.cohort_month,
 
-        date_diff(
-            'month',
-            c.cohort_month,
-            date_trunc('month', o.ordered_at)::date
-        ) as month_offset
+        {{ dbt.datediff('month', c.cohort_month, dbt.date_trunc('month', o.ordered_at)) }} as month_offset
 
     from {{ ref('orders') }} as o
 
@@ -69,7 +65,7 @@ joined as (
         c.cohort_size,
         r.retained_customers,
 
-        r.retained_customers::double / c.cohort_size as retention_rate
+        cast(r.retained_customers as double) / c.cohort_size as retention_rate
 
     from retention as r
 
