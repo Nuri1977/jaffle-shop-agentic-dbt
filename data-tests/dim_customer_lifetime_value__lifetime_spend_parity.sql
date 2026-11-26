@@ -1,4 +1,4 @@
--- Revenue parity: lifetime_spend in the CLV mart must equal lifetime_spend in the customers mart.
+-- Revenue parity: lifetime_spend in the CLV mart must equal revenue (order_total) in orders.
 -- A singular test passes when it returns zero rows.
 with mart as (
 
@@ -7,14 +7,14 @@ with mart as (
 
 ),
 
-customers_mart as (
+orders_mart as (
 
-    select sum(coalesce(lifetime_spend, 0)) as lifetime_spend
-    from {{ ref('customers') }}
+    select sum(coalesce(order_total, 0)) as lifetime_spend
+    from {{ ref('orders') }}
 
 )
 
 select *
 from mart
-cross join customers_mart
-where mart.lifetime_spend <> customers_mart.lifetime_spend
+cross join orders_mart
+where mart.lifetime_spend <> orders_mart.lifetime_spend

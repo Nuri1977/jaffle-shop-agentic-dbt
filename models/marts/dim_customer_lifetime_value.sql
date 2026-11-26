@@ -46,11 +46,7 @@ avg_gaps as (
 
     select
         customer_id,
-        {% if target.type == 'databricks' %}
-        avg(datediff(ordered_at, prev_ordered_at)) as avg_days_between_orders
-        {% else %}
-        avg(date_diff('day', prev_ordered_at, ordered_at)) as avg_days_between_orders
-        {% endif %}
+        avg({{ dbt.datediff('prev_ordered_at', 'ordered_at', 'day') }}) as avg_days_between_orders
 
     from order_gaps
 
@@ -75,11 +71,7 @@ joined as (
         customer_orders.order_count,
         customer_orders.lifetime_spend,
         avg_gaps.avg_days_between_orders,
-        {% if target.type == 'databricks' %}
-        datediff(max_ordered_at, last_order_date) as days_since_last_order
-        {% else %}
-        date_diff('day', last_order_date, max_ordered_at) as days_since_last_order
-        {% endif %}
+        {{ dbt.datediff('last_order_date', 'max_ordered_at', 'day') }} as days_since_last_order
 
     from customers
 
