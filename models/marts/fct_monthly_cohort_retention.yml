@@ -1,0 +1,31 @@
+models:
+  - name: fct_monthly_cohort_retention
+    description: Monthly cohort retention mart. One row per cohort month (a customer's first-order month) and month offset (0-6), showing the cohort size, how many cohort customers reordered in that offset month, and the resulting retention rate.
+    columns:
+      - name: cohort_month
+        description: The first-order month of the cohort, at month grain.
+        data_tests:
+          - not_null
+        entity:
+          type: primary
+          name: cohort_month
+      - name: month_offset
+        description: The number of months since the cohort's first order (0 = the cohort month, 1 = the following month, up to 6).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2, 3, 4, 5, 6]
+        entity:
+          type: primary
+          name: month_offset
+      - name: cohort_size
+        description: The number of customers whose first order was in the cohort month.
+      - name: retained_customers
+        description: The number of cohort customers who placed at least one order in the month at the given month offset.
+      - name: retention_rate
+        description: The share of the cohort that placed at least one order in the month at the given month offset (retained_customers divided by cohort_size).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["cohort_month", "month_offset"]

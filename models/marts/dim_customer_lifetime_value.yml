@@ -1,0 +1,30 @@
+models:
+  - name: dim_customer_lifetime_value
+    description: Customer lifetime value mart. One row per customer, aggregating all of a customer's orders into lifetime spend, order frequency, recency, and a value/recency segment.
+    columns:
+      - name: customer_id
+        description: The unique key of the customer.
+        data_tests:
+          - not_null
+          - unique
+        entity:
+          type: primary
+          name: customer
+      - name: first_order_date
+        description: The date of the customer's first order.
+      - name: last_order_date
+        description: The date of the customer's most recent order.
+      - name: order_count
+        description: The total number of orders the customer has placed.
+      - name: lifetime_spend
+        description: The sum of all order totals (including tax) the customer has ever placed.
+      - name: avg_days_between_orders
+        description: The average number of days between the customer's consecutive orders.
+      - name: days_since_last_order
+        description: The number of days between the customer's last order and the most recent order date in the dataset.
+      - name: segment
+        description: "The customer's recency/value segment: new, active, at risk, or lapsed."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["new", "active", "at risk", "lapsed"]
