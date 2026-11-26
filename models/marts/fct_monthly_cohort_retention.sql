@@ -1,12 +1,22 @@
 with
 
+orders_with_month as (
+
+    select
+        *,
+        cast({{ dbt.date_trunc('month', 'ordered_at') }} as date) as order_month
+
+    from {{ ref('orders') }}
+
+),
+
 customer_first_orders as (
 
     select
         customer_id,
-        cast(dbt.date_trunc('month', min(ordered_at)) as date) as cohort_month
+        min(order_month) as cohort_month
 
-    from {{ ref('orders') }}
+    from orders_with_month
 
     group by 1
 
@@ -18,10 +28,13 @@ customer_orders as (
         o.order_id,
         o.customer_id,
         c.cohort_month,
+        {% if target.type == 'databricks' %}
+        (month(o.order_month) - month(c.cohort_month)) + 12 * (year(o.order_month) - year(c.cohort_month)) as month_offset
+        {% else %}
+        date_diff('month', c.cohort_month, o.order_month) as month_offset
+        {% endif %}
 
-        {{ dbt.datediff('month', c.cohort_month, dbt.date_trunc('month', o.ordered_at)) }} as month_offset
-
-    from {{ ref('orders') }} as o
+    from orders_with_month as o
 
     join customer_first_orders as c
         on o.customer_id = c.customer_id
