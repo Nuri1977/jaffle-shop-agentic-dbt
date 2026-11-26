@@ -1,0 +1,28 @@
+models:
+  - name: fct_store_daily_kpis
+    description: "Store daily KPIs mart. One row per store per day, showing order count, revenue, and average order value. Incremental: only order dates newer than the max date already in the table are processed, with merge dedup on (location_id, order_date)."
+    columns:
+      - name: location_id
+        description: The store (location) that the orders belong to. Foreign key to the locations dimension.
+        data_tests:
+          - not_null
+        entity:
+          type: foreign
+          name: location
+      - name: order_date
+        description: The date the orders were placed on, derived from ordered_at.
+        data_tests:
+          - not_null
+        entity:
+          type: primary
+          name: order_date
+      - name: order_count
+        description: The number of orders placed at the store on the given date.
+      - name: revenue
+        description: The sum of order totals (including tax) for orders placed at the store on the given date.
+      - name: average_order_value
+        description: The average order value per store per day (revenue divided by order count).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["location_id", "order_date"]

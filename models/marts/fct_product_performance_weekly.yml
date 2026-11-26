@@ -1,0 +1,32 @@
+models:
+  - name: fct_product_performance_weekly
+    description: Weekly product performance mart. One row per product per week, showing revenue, units sold, gross margin, and the product's revenue rank within its product type for that week.
+    columns:
+      - name: product_id
+        description: The unique key of the product.
+        data_tests:
+          - not_null
+        entity:
+          type: primary
+          name: product_id
+      - name: product_type
+        description: The type of the product (for example jaffle or beverage).
+      - name: week_start
+        description: The start of the week (Monday grain) in which the order was placed.
+        data_tests:
+          - not_null
+        entity:
+          type: primary
+          name: week_start
+      - name: revenue
+        description: The total product revenue for the week, calculated as the sum of product prices across order items.
+      - name: units
+        description: The number of order items (units) sold for the product in the week.
+      - name: gross_margin
+        description: The gross margin for the week, calculated as revenue minus supply cost (price minus supply cost).
+      - name: rank_within_product_type
+        description: The rank of the product within its product type for the week, ordered by revenue descending (1 = highest revenue).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["product_id", "week_start"]
